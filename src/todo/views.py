@@ -10,3 +10,14 @@ from rest_framework.response import Response
 class TodoItemViewSet(viewsets.ModelViewSet):
     queryset = TodoItem.objects.all()
     serializer_class = TodoItemSerializer
+
+    def perform_create(self, serializer):
+        # Save instance to get primary key and then update URL
+        isinstance = serializer.save()
+        isinstance.url = reverse('todoitem-detail', args=[isinstance.pk], request=self.request)
+        isinstance.save()
+
+    # Delete all todo items
+    def delete(self, request):
+        TodoItem.objects.all().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
