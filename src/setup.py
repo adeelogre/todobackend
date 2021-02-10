@@ -13,7 +13,8 @@ setup (
                             "djangorestframework==3.12.2",
                             "mysqlclient==2.0.3",
                             "pytz==2021.1",
-                            "sqlparse==0.4.1"],
+                            "sqlparse==0.4.1",
+                            "uwsgi>=2.0"],
   extras_require       = {
                             "test": [
                                 "colorama==0.4.4",
