@@ -1,4 +1,4 @@
-from base import *
+from todobackend.settings.base import *
 import os
 
 # Disable debug
