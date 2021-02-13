@@ -18,7 +18,10 @@ CHECK := @bash -c '\
   if [[ $(INSPECT) -ne 0 ]]; \
   then exit $(INSPECT); fi' VALUE
 
-.PHONY: test build release clean
+# Use these settings to specify a custom Docker registry
+DOCKER_REGISTRY ?= docker.io
+
+.PHONY: test build release clean tag
 
 test:
 	${INFO} "Pulling latest images..."
@@ -75,6 +78,11 @@ clean:
 	@ sudo docker system prune -f
 	@ sudo docker volume prune -f 
 	${INFO} "Clean complete"
+
+tag:
+	${INFO} "Tagging release image with tags $(TAG_ARGS)..."
+	@ $(foreach tag,$(TAG_ARGS), sudo docker tag -f $(IMAGE_ID) $(DOCKER_REGISTRY)/$(ORG_NAME)/$(REPO_NAME):$(tag);)
+	${INFO} "Tagging complete"
 
 # Cosmetics
 YELLOW := "\e[1;33m"
