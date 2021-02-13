@@ -1,4 +1,4 @@
-FROM adeelvm/todobackend-base:latest
+FROM adeelogre/todobackend-base:latest
 
 # Copy application artifacts
 COPY target /wheelhouse

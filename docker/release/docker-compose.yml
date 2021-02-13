@@ -19,7 +19,7 @@ app:
     - "--die-on-term"
 
 test:
-  image: adeelvm/todobackend-specs
+  image: adeelogre/todobackend-specs
   links:
     - nginx
   environment:
@@ -56,7 +56,7 @@ db:
     MYSQL_ROOT_PASSWORD: password
 
 agent:
-  image: adeelvm/ansible
+  image: adeelogre/ansible
   links:
     - db
   environment:

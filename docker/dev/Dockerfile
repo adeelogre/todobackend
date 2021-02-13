@@ -1,4 +1,4 @@
-FROM adeelvm/todobackend-base:latest
+FROM adeelogre/todobackend-base:latest
 
 # Install dev/build dependencies
 RUN apt-get update && \
