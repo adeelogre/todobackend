@@ -11,6 +11,9 @@ REL_COMPOSE_FILE := docker/release/docker-compose.yml
 REL_PROJECT := $(PROJECT_NAME)$(BUILD_ID)
 DEV_PROJECT := $(REL_PROJECT)dev
 
+# Application Service Name - must match Docker Compose release specification application service name
+APP_SERVICE_NAME := app
+
 # Check and Inspect Logic
 INSPECT := $$(sudo docker-compose -p $$1 -f $$2 ps -q $$3 | xargs -I ARGS sudo docker inspect -f "{{ .State.ExitCode }}" ARGS)
 
@@ -93,3 +96,18 @@ INFO := @bash -c '\
   printf $(YELLOW); \
   echo "=> $$1"; \
   printf $(NC)' SOME_VALUE
+
+# Get container id of application service container
+APP_CONTAINER_ID := $$(sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) ps -q $(APP_SERVICE_NAME))
+
+# Get image id of application service
+IMAGE_ID := $$(sudo docker inspect -f '{{ .Image }}' $(APP_CONTAINER_ID))
+
+# Extract tag arguments
+ifeq (tag,$(firstword $(MAKECMDGOALS)))
+  TAG_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  ifeq ($(TAG_ARGS),)
+    $(error You must specify a tag)
+  endif
+  $(eval $(TAG_ARGS):;@:)
+endif
