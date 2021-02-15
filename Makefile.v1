@@ -4,8 +4,8 @@ ORG_NAME ?= adeelogre
 REPO_NAME ?= todobackend
 
 # Filenames
-DEV_COMPOSE_FILE := docker/dev/docker-compose-v2.yml
-REL_COMPOSE_FILE := docker/release/docker-compose-v2.yml
+DEV_COMPOSE_FILE := docker/dev/docker-compose.yml
+REL_COMPOSE_FILE := docker/release/docker-compose.yml
 
 # Docker Compose Project Names
 REL_PROJECT := $(PROJECT_NAME)$(BUILD_ID)
@@ -40,12 +40,11 @@ DOCKER_REGISTRY_AUTH ?=
 .PHONY: test build release clean tag login logout publish
 
 test:
-	${INFO} "Creating cache volume..."
-	@ sudo docker volume create --name cache
 	${INFO} "Pulling latest images..."
 	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) pull
 	${INFO} "Building images..."
 	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) build --pull test
+	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) build cache
 	${INFO} "Ensuring database is ready..."
 	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) run --rm agent
 	${INFO} "Running tests..."
@@ -69,6 +68,7 @@ release:
 	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) pull test
 	${INFO} "Building images..."
 	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) build app
+	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) build webroot
 	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) build --pull nginx
 	${INFO} "Ensuring database is ready..."
 	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) run --rm agent
@@ -84,9 +84,11 @@ release:
 
 clean:
 	${INFO} "Destroying development environment..."
-	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) down -v
+	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) kill
+	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) rm -f
 	${INFO} "Destroying release environment..."
-	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) down -v
+	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) kill
+	@ sudo docker-compose -p $(REL_PROJECT) -f $(REL_COMPOSE_FILE) rm -f
 	@ #sudo docker images -q -f dangling=true -f label=application=$(REPO_NAME) | xargs -I ARGS  docker rmi -f ARGS
 	@ ${INFO} "Removing dangling images, containers and volumes..."
 	@ sudo docker system prune -f
