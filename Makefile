@@ -41,7 +41,7 @@ DOCKER_REGISTRY_AUTH ?=
 
 test:
 	${INFO} "Creating cache volume..."
-	@ docker volume create --name cache --privileged
+	@ docker volume create --name cache
 	${INFO} "Pulling latest images..."
 	@ sudo docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) pull
 	${INFO} "Building images..."
