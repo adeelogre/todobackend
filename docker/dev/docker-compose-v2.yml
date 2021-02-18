@@ -42,7 +42,7 @@ services:
     command: ["probe.yml"]
 
   db: 
-    image: mysql:5.6
+    image: mysql:latest
     hostname: db
     expose:
       - "3306"
